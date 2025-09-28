@@ -35,6 +35,9 @@
         <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
 
         <!-- Add icons to the links using the .nav-icon class with font-awesome or any other icon font library -->
+                {{-- =================================================== --}}
+                {{-- MENU BERSAMA (Bisa dilihat semua role) --}}
+                {{-- =================================================== --}}
           <li class="nav-item">
             <a href="{{ route('dashboard')}}" class="nav-link">
               <i class="fas fa-chart-line"></i>
@@ -44,7 +47,10 @@
               </p>
             </a>
           </li>
-
+                {{-- =================================================== --}}
+                {{-- AWAL BAGIAN KHUSUS ADMIN --}}
+                {{-- =================================================== --}}
+          @if (Auth::user()->role =='admin')
           <li class="nav-item">
             <a href="{{ route('dataBuku')}}" class="nav-link">
               <i class="fas fa-book-open"></i>
@@ -94,7 +100,15 @@
               </p>
             </a>
           </li>
+          @endif
+                {{-- =================================================== --}}
+                {{-- AKHIR BAGIAN KHUSUS ADMIN --}}
+                {{-- =================================================== --}}
 
+                {{-- =================================================== --}}
+                {{-- AWAL BAGIAN KHUSUS USER --}}
+                {{-- =================================================== --}}
+          @if (Auth::user()->role =='user')
           <li class="nav-item">
             <a href="{{ route('katalogBuku') }}" class="nav-link">
               <i class="fas fa-th-list"></i>
@@ -114,7 +128,10 @@
               </p>
             </a>
           </li>
-
+          @endif
+                {{-- =================================================== --}}
+                {{-- AKHIR BAGIAN KHUSUS USER --}}
+                {{-- =================================================== --}}
         </ul>
       </nav>
       <!-- /.sidebar-menu -->

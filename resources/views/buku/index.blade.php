@@ -16,6 +16,7 @@
                         <thead>
                             <tr>
                                 <th>Judul</th>
+                                <th>Gambar</th>
                                 <th>Penulis</th>
                                 <th>Penerbit</th>
                                 <th>Tahun Terbit</th>
@@ -27,6 +28,13 @@
                             @foreach($buku as $b)
                             <tr>
                                 <td>{{ $b->judul }}</td>
+                                <td>
+                                    @if($b->gambar)
+                                        <img src="{{ asset('storage/' . $b->gambar) }}" alt="Sampul {{ $b->judul }}" style="width: 100px; height: auto;">
+                                    @else
+                                        <span>Tidak ada gambar</span>
+                                    @endif
+                                </td>
                                 <td>{{ $b->penulis }}</td>
                                 <td>{{ $b->penerbit }}</td>
                                 <td>{{ $b->tahun_terbit }}</td>

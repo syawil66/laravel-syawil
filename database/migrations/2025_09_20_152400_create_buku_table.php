@@ -10,10 +10,11 @@ return new class extends Migration {
         Schema::create('buku', function (Blueprint $table) {
             $table->id();
             $table->string('judul');
+            $table->string('gambar')->nullable();
             $table->string('penulis');
             $table->string('penerbit');
             $table->year('tahun_terbit');
-            $table->integer('jumlah');
+            $table->integer('stok');
             $table->timestamps();
         });
     }

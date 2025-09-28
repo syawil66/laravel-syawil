@@ -13,9 +13,10 @@ class Buku extends Model
 
     protected $fillable = [
         'judul',
+        'gambar',
         'penulis',
         'penerbit',
         'tahun_terbit',
-        'jumlah',
+        'stok',
     ];
 }

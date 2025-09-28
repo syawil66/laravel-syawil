@@ -13,8 +13,13 @@
                 </div>
             @endif
 
-            <form action="{{ route('storeBuku') }}" method="POST">
+            <form action="{{ route('storeBuku') }}" method="POST" enctype="multipart/form-data">
                 @csrf
+                <div class="form-group">
+                    <label for="gambar">Gambar Sampul</label>
+                    <input type="file" name="gambar" class="form-control">
+                </div>
+
                 <div class="form-group">
                     <label>Judul Buku</label>
                     <input type="text" name="judul" class="form-control" value="{{ old('judul') }}">
@@ -37,7 +42,7 @@
 
                 <div class="form-group">
                     <label>Jumlah</label>
-                    <input type="number" name="jumlah" class="form-control" value="{{ old('jumlah') }}">
+                    <input type="number" name="stok" class="form-control" value="{{ old('stok') }}">
                 </div>
 
                 <button type="submit" class="btn btn-success">Simpan</button>

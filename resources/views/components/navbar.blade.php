@@ -7,7 +7,7 @@
         <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
       </li>
       <li class="nav-item d-none d-sm-inline-block">
-        <a href="index3.html" class="nav-link">Home</a>
+        <a href="{{ route('dashboard')}}" class="nav-link">Home</a>
       </li>
       <li class="nav-item d-none d-sm-inline-block">
         <a href="#" class="nav-link">Contact</a>
@@ -139,6 +139,30 @@
           <i class="fas fa-user-cog"></i>
         </a>
       </li>
+
+    <!-- lougout -->
+      <li class="nav-item dropdown">
+    <a class="nav-link" data-toggle="dropdown" href="#">
+        <i class="far fa-user mr-2"></i>
+        <span>{{ Auth::user()->name }}</span>
+    </a>
+    <div class="dropdown-menu dropdown-menu-right">
+        <span class="dropdown-item dropdown-header">Menu Pengguna</span>
+        <div class="dropdown-divider"></div>
+        <a href="#" class="dropdown-item">
+            <i class="fas fa-user-edit mr-2"></i> Edit Profil
+        </a>
+        <div class="dropdown-divider"></div>
+        {{-- Tombol Logout --}}
+        <form action="{{ route('AuthLogout') }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin logout?');">
+            @csrf
+            <button type="submit" class="dropdown-item">
+                <i class="fas fa-sign-out-alt mr-2"></i> Logout
+            </button>
+        </form>
+    </div>
+</li>
+
     </ul>
   </nav>
   <!-- /.navbar -->
