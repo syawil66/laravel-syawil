@@ -46,7 +46,7 @@
 
       {{-- ... bagian social auth ... --}}
 
-      <a href="{{ route('AuthLogin') }}" class="text-center">I already have a membership</a>
+      <a href="{{ route('login') }}" class="text-center">I already have a membership</a>
     </div>
   </div>
 </div>

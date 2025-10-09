@@ -48,4 +48,12 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    public function isBorrowing($bukuId)
+    {
+        return Peminjaman::where('user_id', $this->id)
+                         ->where('buku_id', $bukuId)
+                         ->where('status', 'dipinjam')
+                         ->exists();
+    }
 }

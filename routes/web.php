@@ -11,15 +11,15 @@ use App\Http\Controllers\AuthController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return view('welcome');
+    return redirect()->route('login');
 });
 
 //rute untuk yang belum login(guest)
 Route::middleware(['guest'])->group(function () {
 
 //Login & register
-Route::get('/login', [AuthController::class, 'showlogin'])->name('AuthLogin');
-Route::get('/register', [AuthController::class, 'showregister'])->name('AuthRegister');
+Route::get('/login', [AuthController::class, 'showlogin'])->name('login');
+Route::get('/register', [AuthController::class, 'showregister'])->name('register');
 
 // Rute untuk memproses data dari form
 Route::post('/login', [AuthController::class, 'processLogin'])->name('login.process');
@@ -59,7 +59,11 @@ Route::put('/anggota/update/{id}', [AnggotaController::class, 'update'])->name('
 Route::delete('/anggota/delete/{id}', [AnggotaController::class, 'destroy'])->name('deleteAnggota');
 
 // Data Peminjaman
-Route::get('/data-peminjaman', [PinjamanController::class, 'index'])->name('dataPeminjaman');
+Route::get('/data-peminjaman', [App\Http\Controllers\PeminjamanController::class, 'index'])->name('dataPeminjaman');
+Route::get('/data-pengembalian', [App\Http\Controllers\PeminjamanController::class, 'dataPengembalian'])->name('dataPengembalian');
+Route::post('/peminjaman/kembalikan/{id}', [App\Http\Controllers\PeminjamanController::class, 'kembalikanBuku'])->name('kembalikanBuku');
+Route::delete('/peminjaman/delete/{id}', [App\Http\Controllers\PeminjamanController::class, 'destroy'])->name('deletePeminjaman');
+
 
 // Data Pengembalian
 Route::get('/data-pengembalian', [PengembalianController::class, 'index'])->name('dataPengembalian');
@@ -75,6 +79,10 @@ Route::get('/katalog-buku', [KatalogController::class, 'index'])->name('katalogB
 
 // Riwayat Peminjaman
 Route::get('/riwayat-peminjaman', [RiwayatPeminjamanController::class, 'index'])->name('riwayatPeminjaman');
+
+// Rute untuk user meminjam buku (method POST)
+Route::post('/buku/pinjam/{id}', [App\Http\Controllers\PeminjamanController::class, 'pinjamBuku'])->name('pinjamBuku');
+Route::get('/riwayat-peminjaman', [App\Http\Controllers\PeminjamanController::class, 'riwayatPeminjaman'])->name('riwayatPeminjaman');
 
 });
 

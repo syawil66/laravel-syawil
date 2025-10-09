@@ -19,4 +19,25 @@ class Buku extends Model
         'tahun_terbit',
         'stok',
     ];
+
+    public function isAvailable()
+    {
+        return $this->stok > 0;
+    }
+
+    public function decreaseStock()
+    {
+        if ($this->isAvailable()) {
+            $this->stok--;
+            $this->save();
+            return true;
+        }
+        return false;
+    }
+
+    public function increaseStock()
+    {
+        $this->stok++;
+        $this->save();
+    }
 }

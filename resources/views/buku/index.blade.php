@@ -17,7 +17,7 @@
                             <tr>
                                 <th>Judul</th>
                                 <th>Gambar</th>
-                                <th>Penulis</th>
+                                <th>Penulis</th> 
                                 <th>Penerbit</th>
                                 <th>Tahun Terbit</th>
                                 <th>Stok</th>

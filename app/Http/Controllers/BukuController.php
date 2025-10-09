@@ -91,4 +91,5 @@ class BukuController extends Controller
 
         return redirect()->route('dataBuku')->with('success', 'Buku berhasil dihapus!');
     }
+
 }
