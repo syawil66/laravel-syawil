@@ -8,6 +8,7 @@ use App\Http\Controllers\LaporanController;
 use App\Http\Controllers\KatalogController;
 use App\Http\Controllers\RiwayatPeminjamanController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\DashboardController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -28,9 +29,7 @@ Route::post('/register', [AuthController::class, 'processRegister'])->name('regi
 
 //grup untuk user yang sudah login
 Route::middleware(['auth'])->group(function () {
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->name("dashboard");
+Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
 Route::post('/logout', [App\Http\Controllers\AuthController::class, 'logout'])->name('AuthLogout');
 
