@@ -20,6 +20,7 @@ return new class extends Migration
             $table->enum('role',['admin','user'])->default('user');
             $table->string(column: 'alamat')->nullable();
             $table->string('no_telp')->nullable();
+            $table->string('foto_profil')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });

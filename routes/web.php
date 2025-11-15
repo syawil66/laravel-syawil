@@ -2,13 +2,13 @@
 
 use App\Http\Controllers\BukuController;
 use App\Http\Controllers\AnggotaController;
-use App\Http\Controllers\PinjamanController;
+use App\Http\Controllers\PeminjamanController;
 use App\Http\Controllers\PengembalianController;
 use App\Http\Controllers\LaporanController;
 use App\Http\Controllers\KatalogController;
-use App\Http\Controllers\RiwayatPeminjamanController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -31,6 +31,9 @@ Route::post('/register', [AuthController::class, 'processRegister'])->name('regi
 Route::middleware(['auth'])->group(function () {
 Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
+Route::get('/profil', [ProfileController::class, 'edit'])->name('profile.edit');
+Route::post('/profil', [ProfileController::class, 'update'])->name('profile.update');
+
 Route::post('/logout', [App\Http\Controllers\AuthController::class, 'logout'])->name('AuthLogout');
 
 
@@ -39,6 +42,7 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
 
 // Data Laporan
 Route::get('/data-laporan', [LaporanController::class, 'index'])->name('dataLaporan');
+Route::get('/cetak-laporan', [LaporanController::class, 'cetakLaporan'])->name('cetakLaporan');
 
 
 // Data Buku
@@ -66,6 +70,9 @@ Route::delete('/peminjaman/delete/{id}', [App\Http\Controllers\PeminjamanControl
 
 // Data Pengembalian
 Route::get('/data-pengembalian', [PengembalianController::class, 'index'])->name('dataPengembalian');
+Route::get('/data-pengembalian', [PeminjamanController::class, 'dataPengembalian'])->name('dataPengembalian');
+Route::post('/peminjaman/kembalikan/{id}', [PeminjamanController::class, 'kembalikanBuku'])->name('kembalikanBuku');
+Route::delete('/peminjaman/delete/{id}', [PeminjamanController::class, 'destroy'])->name('deletePeminjaman');
 
 });
 
@@ -77,7 +84,7 @@ Route::get('/katalog-buku', [KatalogController::class, 'index'])->name('katalogB
 
 
 // Riwayat Peminjaman
-Route::get('/riwayat-peminjaman', [RiwayatPeminjamanController::class, 'index'])->name('riwayatPeminjaman');
+Route::get('/riwayat-peminjaman', [PeminjamanController::class, 'index'])->name('riwayatPeminjaman');
 
 // Rute untuk user meminjam buku (method POST)
 Route::post('/buku/pinjam/{id}', [App\Http\Controllers\PeminjamanController::class, 'pinjamBuku'])->name('pinjamBuku');

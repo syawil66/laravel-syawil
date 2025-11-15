@@ -2,12 +2,158 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Peminjaman;
+use App\Models\Buku;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
 
-class PengembalianController extends Controller
+class PeminjamanController extends Controller
 {
+    // Method untuk user meminjam buku
+    public function pinjamBuku(Request $request, $bukuId)
+    {
+        $buku = Buku::findOrFail($bukuId);
+        $user = Auth::user();
+
+        // Validasi
+        if (!$buku->isAvailable()) {
+            return redirect()->back()->with('error', 'Buku tidak tersedia untuk dipinjam.');
+        }
+
+        // Cek apakah user sudah meminjam buku yang sama dan belum dikembalikan
+        if ($user->isBorrowing($bukuId)) {
+            return redirect()->back()->with('error', 'Anda sudah meminjam buku ini dan belum mengembalikannya.');
+        }
+
+        // Buat peminjaman
+        $peminjaman = Peminjaman::create([
+            'user_id' => $user->id,
+            'buku_id' => $bukuId,
+            'tanggal_pinjam' => Carbon::now(),
+            'tanggal_kembali' => Carbon::now()->addDays(7), // 7 hari batas peminjaman
+            'status' => 'dipinjam',
+        ]);
+
+        // Kurangi stok buku
+        $buku->decreaseStock();
+
+        return redirect()->back()->with('success', 'Buku berhasil dipinjam. Harap dikembalikan sebelum ' . $peminjaman->tanggal_kembali->format('d M Y'));
+    }
+
+    // Method untuk admin melihat data peminjaman
     public function index()
     {
-        return view('datapengembalian');
+        $peminjaman = Peminjaman::with(['user', 'buku'])
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return view('dataPeminjaman', compact('peminjaman'));
+    }
+
+public function kembalikanBuku($peminjamanId)
+    {
+        $peminjaman = Peminjaman::findOrFail($peminjamanId);
+        $tanggalPengembalian = Carbon::now();
+
+        // Hitung keterlambatan
+        $hariTerlambat = $this->hitungKeterlambatan($peminjaman->tanggal_kembali, $tanggalPengembalian);
+        $denda = $this->hitungBesaranDenda($hariTerlambat); // Ganti nama method
+
+        // Update status dan tanggal pengembalian
+        $peminjaman->update([
+            'status' => 'dikembalikan',
+            'tanggal_pengembalian' => $tanggalPengembalian,
+            'denda' => $denda,
+        ]);
+
+        // Tambah stok buku
+        $peminjaman->buku->increaseStock();
+
+        $message = 'Buku berhasil dikembalikan.';
+        if ($hariTerlambat > 0) {
+            $message .= " Terlambat {$hariTerlambat} hari. Denda: Rp " . number_format($denda, 0, ',', '.');
+        }
+
+        return redirect()->back()->with('success', $message);
+    }
+
+    private function hitungKeterlambatan($tanggalKembali, $tanggalPengembalian)
+    {
+        $tanggalKembali = Carbon::parse($tanggalKembali);
+        $tanggalPengembalian = Carbon::parse($tanggalPengembalian);
+
+        // Jika dikembalikan setelah tanggal kembali, hitung keterlambatan
+        if ($tanggalPengembalian->gt($tanggalKembali)) {
+            return $tanggalPengembalian->diffInDays($tanggalKembali);
+        }
+
+        return 0; // Tidak terlambat
+    }
+
+    // GANTI NAMA METHOD untuk hindari duplikasi
+    private function hitungBesaranDenda($hariTerlambat)
+    {
+        if ($hariTerlambat > 0) {
+            return $hariTerlambat * 5000; // Rp 5.000 per hari
+        }
+        return 0;
+    }
+
+    // Method untuk menghapus data peminjaman
+    public function destroy($id)
+    {
+        $peminjaman = Peminjaman::findOrFail($id);
+
+        // Jika buku masih dipinjam, tambah stok kembali
+        if ($peminjaman->status === 'dipinjam') {
+            $peminjaman->buku->increaseStock();
+        }
+
+        $peminjaman->delete();
+
+        return redirect()->back()->with('success', 'Data peminjaman berhasil dihapus.');
+    }
+
+    public function dataPengembalian()
+    {
+        $pengembalian = Peminjaman::with(['user', 'buku'])
+            ->where('status', 'dikembalikan')
+            ->orderBy('tanggal_pengembalian', 'desc')
+            ->get();
+
+        return view('dataPengembalian', compact('pengembalian'));
+    }
+
+    // Method untuk riwayat peminjaman user
+    public function riwayatPeminjaman()
+    {
+        $user = Auth::user();
+        $riwayat = Peminjaman::with('buku')
+            ->where('user_id', $user->id)
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return view('riwayatPeminjaman', compact('riwayat'));
+    }
+
+    // Method untuk menghitung denda (opsional)
+    public function hitungDenda($peminjamanId)
+    {
+        $peminjaman = Peminjaman::findOrFail($peminjamanId);
+
+        if ($peminjaman->status === 'dipinjam' && Carbon::now()->gt($peminjaman->tanggal_kembali)) {
+            $hariTerlambat = Carbon::now()->diffInDays($peminjaman->tanggal_kembali);
+            $denda = $hariTerlambat * 5000; // Denda Rp 5.000 per hari
+
+            $peminjaman->update([
+                'status' => 'terlambat',
+                'denda' => $denda
+            ]);
+
+            return $denda;
+        }
+
+        return 0;
     }
 }

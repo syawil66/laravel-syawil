@@ -30,7 +30,7 @@ class PeminjamanController extends Controller
             'user_id' => $user->id,
             'buku_id' => $bukuId,
             'tanggal_pinjam' => Carbon::now(),
-            'tanggal_kembali' => Carbon::now()->addDays(7), // 7 hari batas peminjaman
+            'tanggal_kembali' => Carbon::now()->addMinute(1), // 7 hari batas peminjaman
             'status' => 'dipinjam',
         ]);
 
@@ -54,17 +54,36 @@ class PeminjamanController extends Controller
     public function kembalikanBuku($peminjamanId)
     {
         $peminjaman = Peminjaman::findOrFail($peminjamanId);
+        $tanggalPengembalian = Carbon::now();
+        $denda = 0;
+        $menitTerlambat = 0;
+        $tanggalKembali = Carbon::parse($peminjaman->tanggal_kembali);
 
-        // Update status dan tanggal pengembalian
+        // Cek apakah tanggal pengembalian LEBIH DARI batas waktu
+        if ($tanggalPengembalian->gt($tanggalKembali)) {
+            $menitTerlambat = $tanggalPengembalian->diffInMinutes($tanggalKembali);
+            if ($menitTerlambat < 1) {
+                $menitTerlambat = 1;
+            }
+            $denda = $menitTerlambat * 2000;
+        }
+
+        // Update status, tanggal pengembalian, DAN denda
         $peminjaman->update([
             'status' => 'dikembalikan',
-            'tanggal_pengembalian' => Carbon::now(),
+            'tanggal_pengembalian' => $tanggalPengembalian,
+            'denda' => $denda
         ]);
 
         // Tambah stok buku
         $peminjaman->buku->increaseStock();
 
-        return redirect()->back()->with('success', 'Buku berhasil dikembalikan.');
+        $message = 'Buku berhasil dikembalikan.';
+        if ($menitTerlambat > 0) {
+            $message .= " Terlambat {$menitTerlambat} menit. Denda: Rp " . number_format($denda, 0, ',', '.');
+        }
+
+        return redirect()->back()->with('success', $message);
     }
 
     // Method untuk menghapus data peminjaman
@@ -104,23 +123,4 @@ class PeminjamanController extends Controller
         return view('riwayatPeminjaman', compact('riwayat'));
     }
 
-    // Method untuk menghitung denda (opsional)
-    public function hitungDenda($peminjamanId)
-    {
-        $peminjaman = Peminjaman::findOrFail($peminjamanId);
-
-        if ($peminjaman->status === 'dipinjam' && Carbon::now()->gt($peminjaman->tanggal_kembali)) {
-            $hariTerlambat = Carbon::now()->diffInDays($peminjaman->tanggal_kembali);
-            $denda = $hariTerlambat * 5000; // Denda Rp 5.000 per hari
-
-            $peminjaman->update([
-                'status' => 'terlambat',
-                'denda' => $denda
-            ]);
-
-            return $denda;
-        }
-
-        return 0;
-    }
 }

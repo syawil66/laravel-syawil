@@ -136,20 +136,26 @@
       <!-- large icon -->
       <li class="nav-item">
         <a class="nav-link" data-widget="control-sidebar" data-controlsidebar-slide="true" href="#" role="button">
-          <i class="fas fa-user-cog"></i>
+        <i class="fas fa-user-cog"></i>
         </a>
-      </li>
+    </li>
 
-    <!-- lougout -->
-      <li class="nav-item dropdown">
+        <!-- User Account Menu -->
+    <li class="nav-item dropdown">
     <a class="nav-link" data-toggle="dropdown" href="#">
-        <i class="far fa-user mr-2"></i>
+        @if (Auth::user()->foto_profil)
+            <img src="{{ asset('storage/' . Auth::user()->foto_profil) }}"
+                class="img-circle" alt="User Image"
+                style="width: 25px; height: 25px; object-fit: cover; margin-right: 5px;">
+        @else
+            <i class="far fa-user mr-2"></i>
+        @endif
         <span>{{ Auth::user()->name }}</span>
     </a>
     <div class="dropdown-menu dropdown-menu-right">
         <span class="dropdown-item dropdown-header">Menu Pengguna</span>
         <div class="dropdown-divider"></div>
-        <a href="#" class="dropdown-item">
+        <a href="{{ route('profile.edit')}}" class="dropdown-item">
             <i class="fas fa-user-edit mr-2"></i> Edit Profil
         </a>
         <div class="dropdown-divider"></div>
